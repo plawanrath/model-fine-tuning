@@ -1,0 +1,60 @@
+# How to run
+# export PYTORCH_ENABLE_MPS_FALLBACK=1
+# export OMP_NUM_THREADS=8
+
+# Train
+# python -m axolotl.cli.train mistral_lora_offline.yaml
+
+
+# merge
+# python -m axolotl.cli.merge_lora mistral_lora_offline.yaml
+
+# ── 1. model & data ────────────────────────────────────────────────────────
+base_model: ../models/Mistral-7B-v0.1             # your local clone / merged model
+use_peft: true
+# python -m axolotl.cli.merge_lora mistral_lora_offline.yaml
+# uncomment here to merge
+peft_model: ../output/mistral-lora
+load_in_4bit: false  # or true, depending on setup
+trust_remote_code: true
+
+datasets:
+  - path: ../../../rust_alpaca.json
+    type: alpaca
+
+tokenizer:
+  truncation_side: left
+
+# ── 2. LoRA settings ───────────────────────────────────────────────────────
+lora:
+  r: 8
+  alpha: 16
+  dropout: 0.05
+  target_modules: [q_proj, k_proj, v_proj, o_proj]
+
+output_dir: ../output/mistral-lora
+
+# ── 3. **Training knobs MUST be top‑level** ────────────────────────────────
+micro_batch_size: 4
+gradient_accumulation_steps: 4   # ← recognised name
+# batch_size: 16                   # (4 × 4) effective
+
+num_epochs: 3
+learning_rate: 1.5e-4
+lr_scheduler_type: cosine
+warmup_steps: 75
+
+logging_steps: 10
+save_strategy: epoch
+
+precision: float32               # fp32 on MPS
+fp16: false                 # <‑ turn OFF explicitly
+bf16: false                 # <‑ turn OFF explicitly
+mixed_precision: "no"       # <‑ tells Accelerate
+gradient_checkpointing: true
+
+# ── 4. Disable CUDA‑only quantisation paths ───────────────────────────────
+load_in_8bit: false
+load_in_4bit: false
+
+trust_remote_code: true

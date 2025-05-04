@@ -31,5 +31,31 @@ huggingface-cli download bigcode/the-stack-smol \
 git clone https://github.com/ggerganov/llama.cpp
 cd llama.cpp
 pip install -r requirements.txt
-python convert.py ./output/mistral-lora/merged --outfile mistral-lora.gguf
+python ./convert-hf-to-gguf.py \
+   ../output/mistral-lora-merged \
+   --outfile ../output/mistral-lora-f16.gguf \
+   --outtype f16
 ```
+
+Optionally quantize
+
+```
+./quantize ../output/mistral-lora-f16.gguf \
+           ../output/mistral-lora-q4_K_M.gguf \
+           q4_K_M # or q5_1, q6_K, etc.
+```
+
+
+### Why LM Studio still can’t “see” the file
+
+LM Studio doesn’t just scan every file directly inside ~/.lmstudio/models/.
+For each model it expects two nested folders:
+
+perl
+Copy
+Edit
+~/.lmstudio/models/
+└── <publisher-name>/
+    └── <model-name>/
+        └── model-file.gguf
+(That layout matches what Hugging Face uses and is in the official docs.)

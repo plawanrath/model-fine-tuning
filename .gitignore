@@ -4,3 +4,4 @@ output/*
 scripts/wandb/*
 scripts/__pycache__
 models/*
+datasets/*

@@ -31,12 +31,21 @@ huggingface-cli download bigcode/the-stack-smol \
 git clone https://github.com/ggerganov/llama.cpp
 cd llama.cpp
 pip install -r requirements.txt
-python ./convert-hf-to-gguf.py \
-   ../output/mistral-lora-merged \
-   --outfile ../output/mistral-lora-f16.gguf \
+python ./convert_hf_to_gguf.py \
+   ../output/yi-9b-rust-v1-merged \
+   --outfile ../output/yi-9b-rust-v1-f16.gguf \
    --outtype f16
 ```
 
+If you want larger context length you need the following:
+
+```
+python ./convert_hf_to_gguf.py \
+   ../output/yi-9b-rust-v1-merged \
+   --outfile ../output/yi-9b-rust-v1-f16.gguf \
+   --outtype f16 \
+   --metadata context_length=200000
+```
 Optionally quantize
 
 ```
